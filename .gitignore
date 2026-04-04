@@ -6,7 +6,16 @@ target/
 .Documentation/
 .idea/
 .mvn/
-.log/
+.log/**test-*.log
+.target/
+*md
+logs/
+QUICK_START_CARD.txt
+upload-to-github.ps1
+logs/
+*.log
+
+
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
