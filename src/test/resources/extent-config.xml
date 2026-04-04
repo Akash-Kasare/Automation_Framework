@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extentreports>
+    <configuration>
+        <!-- Report theme: standard, dark -->
+        <theme>standard</theme>
+
+        <!-- Document title -->
+        <documentTitle>SauceDemo Automation Test Report</documentTitle>
+
+        <!-- Report name -->
+        <reportName>SauceDemo Test Execution Report</reportName>
+
+        <!-- Report description -->
+        <reportDescription>Comprehensive automation testing report with detailed test execution information, screenshots, and logs</reportDescription>
+
+        <!-- Enable/disable screenshots on pass -->
+        <screenshotsOnPass>true</screenshotsOnPass>
+
+        <!-- Enable/disable screenshots on fail -->
+        <screenshotsOnFail>true</screenshotsOnFail>
+
+        <!-- Enable/disable screenshots on skip -->
+        <screenshotsOnSkip>false</screenshotsOnSkip>
+
+        <!-- Report encryption -->
+        <encrypted>false</encrypted>
+
+        <!-- Enable/disable time stamps -->
+        <timeStampFormat>MMM dd, yyyy HH:mm:ss</timeStampFormat>
+
+        <!-- Project name -->
+        <projectName>SauceDemo Automation Testing Framework</projectName>
+
+        <!-- Charts -->
+        <charts>true</charts>
+
+        <!-- Enable/disable category view -->
+        <categoryView>false</categoryView>
+
+        <!-- Enable/disable test-by-device view -->
+        <testViewCharts>true</testViewCharts>
+
+        <!-- Enable/disable dashboard view -->
+        <dashboardView>true</dashboardView>
+
+        <!-- Protocol type -->
+        <protocol>https</protocol>
+
+        <!-- Author -->
+        <author>QA Automation Team</author>
+
+        <!-- System info -->
+        <systemInfo>
+            <entry key="Environment">QA</entry>
+            <entry key="Browser">Chrome</entry>
+            <entry key="OS">Windows 11</entry>
+            <entry key="Application URL">https://www.saucedemo.com/</entry>
+            <entry key="Execution Mode">Automated</entry>
+            <entry key="Test Framework">Cucumber + Selenium + JUnit</entry>
+        </systemInfo>
+
+        <!-- Styles -->
+        <styles>
+            <!-- CSS overrides can be added here -->
+        </styles>
+    </configuration>
+</extentreports>
+

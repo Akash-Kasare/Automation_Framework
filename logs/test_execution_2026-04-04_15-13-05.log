@@ -1,0 +1,11 @@
+[INFO] [15:13:05] 
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ SCENARIO STARTED: User successfully logs in with valid credentials         
+┃ Start Time: 2026-04-04 15:13:05
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[INFO] [15:13:05] [INFO] Scenario Tags: [@Login, @Smoke]
+[INFO] [15:13:05] 
+╔════════════════════════════════════════════════════════════╗
+║ STEP STARTED: Navigate to SauceDemo Application                        
+║ Timestamp: 2026-04-04 15:13:05
+╚════════════════════════════════════════════════════════════╝
