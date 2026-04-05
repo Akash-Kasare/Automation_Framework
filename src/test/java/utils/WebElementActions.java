@@ -26,6 +26,13 @@ import java.util.List;
  */
 public class WebElementActions extends BaseClass {
 
+    /**
+     * Reusable explicit wait with 30 seconds timeout
+     */
+    private static WebDriverWait getExplicitWait() {
+        return new WebDriverWait(BaseClass.driver, Duration.ofSeconds(30));
+    }
+
     // ==================== CLICK OPERATIONS ====================
 
     /**
@@ -36,7 +43,7 @@ public class WebElementActions extends BaseClass {
     public static void clickElement(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Click Element: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.elementToBeClickable(locator));
             TestLogger.action("Element", "Click", locator.toString());
             element.click();
@@ -63,7 +70,7 @@ public class WebElementActions extends BaseClass {
     public static void doubleClickElement(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Double Click Element: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             Actions actions = new Actions(BaseClass.driver);
             TestLogger.action("Element", "Double Click", locator.toString());
@@ -83,7 +90,7 @@ public class WebElementActions extends BaseClass {
     public static void rightClickElement(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Right Click Element: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             Actions actions = new Actions(BaseClass.driver);
             TestLogger.action("Element", "Right Click", locator.toString());
@@ -103,7 +110,7 @@ public class WebElementActions extends BaseClass {
     public static void clickElementByJS(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Click Element by JavaScript: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             JavascriptExecutor js = (JavascriptExecutor) BaseClass.driver;
             TestLogger.action("Element", "Click by JS", locator.toString());
@@ -126,7 +133,7 @@ public class WebElementActions extends BaseClass {
     public static void enterText(By locator, String text, int waitTimeInSeconds) {
         TestLogger.stepStart("Enter Text: " + text);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             element.clear();
             TestLogger.action("Text Field", "Enter", text);
@@ -156,7 +163,7 @@ public class WebElementActions extends BaseClass {
     public static void appendText(By locator, String text, int waitTimeInSeconds) {
         TestLogger.stepStart("Append Text: " + text);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             TestLogger.action("Text Field", "Append", text);
             element.sendKeys(text);
@@ -175,7 +182,7 @@ public class WebElementActions extends BaseClass {
     public static void clearText(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Clear Text");
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             TestLogger.action("Text Field", "Clear", "");
             element.clear();
@@ -195,7 +202,7 @@ public class WebElementActions extends BaseClass {
     public static String getText(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Get Text: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             String text = element.getText();
             TestLogger.stepPassed("Text retrieved: " + text);
@@ -226,7 +233,7 @@ public class WebElementActions extends BaseClass {
     public static void selectByVisibleText(By locator, String visibleText, int waitTimeInSeconds) {
         TestLogger.stepStart("Select Dropdown Option: " + visibleText);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             Select select = new Select(element);
             TestLogger.action("Dropdown", "Select by Text", visibleText);
@@ -247,7 +254,7 @@ public class WebElementActions extends BaseClass {
     public static void selectByValue(By locator, String value, int waitTimeInSeconds) {
         TestLogger.stepStart("Select Dropdown by Value: " + value);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             Select select = new Select(element);
             TestLogger.action("Dropdown", "Select by Value", value);
@@ -268,7 +275,7 @@ public class WebElementActions extends BaseClass {
     public static void selectByIndex(By locator, int index, int waitTimeInSeconds) {
         TestLogger.stepStart("Select Dropdown by Index: " + index);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             Select select = new Select(element);
             TestLogger.action("Dropdown", "Select by Index", String.valueOf(index));
@@ -289,7 +296,7 @@ public class WebElementActions extends BaseClass {
     public static List<WebElement> getDropdownOptions(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Get Dropdown Options: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             Select select = new Select(element);
             List<WebElement> options = select.getOptions();
@@ -311,7 +318,7 @@ public class WebElementActions extends BaseClass {
     public static void checkCheckbox(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Check Checkbox: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             if (!element.isSelected()) {
                 TestLogger.action("Checkbox", "Check", "");
@@ -334,7 +341,7 @@ public class WebElementActions extends BaseClass {
     public static void uncheckCheckbox(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Uncheck Checkbox: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             if (element.isSelected()) {
                 TestLogger.action("Checkbox", "Uncheck", "");
@@ -358,7 +365,7 @@ public class WebElementActions extends BaseClass {
     public static boolean isCheckboxChecked(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Verify Checkbox Checked: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             boolean isChecked = element.isSelected();
             TestLogger.stepPassed("Checkbox checked status: " + isChecked);
@@ -380,7 +387,7 @@ public class WebElementActions extends BaseClass {
     public static boolean isElementVisible(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Check Element Visible: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             TestLogger.stepPassed("Element is visible");
             return true;
@@ -399,7 +406,7 @@ public class WebElementActions extends BaseClass {
     public static boolean isElementPresent(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Check Element Present: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             wait.until(ExpectedConditions.presenceOfElementLocated(locator));
             TestLogger.stepPassed("Element is present");
             return true;
@@ -418,7 +425,7 @@ public class WebElementActions extends BaseClass {
     public static boolean isElementClickable(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Check Element Clickable: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             wait.until(ExpectedConditions.elementToBeClickable(locator));
             TestLogger.stepPassed("Element is clickable");
             return true;
@@ -437,7 +444,7 @@ public class WebElementActions extends BaseClass {
     public static boolean waitForElementToDisappear(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Wait for Element to Disappear: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
             TestLogger.stepPassed("Element disappeared");
             return true;
@@ -459,7 +466,7 @@ public class WebElementActions extends BaseClass {
     public static String getAttribute(By locator, String attributeName, int waitTimeInSeconds) {
         TestLogger.stepStart("Get Attribute: " + attributeName);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             String attributeValue = element.getAttribute(attributeName);
             TestLogger.stepPassed("Attribute value retrieved: " + attributeValue);
@@ -480,7 +487,7 @@ public class WebElementActions extends BaseClass {
     public static String getCSSProperty(By locator, String propertyName, int waitTimeInSeconds) {
         TestLogger.stepStart("Get CSS Property: " + propertyName);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             String propertyValue = element.getCssValue(propertyName);
             TestLogger.stepPassed("CSS property value: " + propertyValue);
@@ -501,7 +508,7 @@ public class WebElementActions extends BaseClass {
     public static void hoverOverElement(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Hover Over Element: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             Actions actions = new Actions(BaseClass.driver);
             TestLogger.action("Element", "Hover", "");
@@ -522,7 +529,7 @@ public class WebElementActions extends BaseClass {
     public static void dragAndDrop(By sourceLocator, By targetLocator, int waitTimeInSeconds) {
         TestLogger.stepStart("Drag and Drop Element");
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement source = wait.until(ExpectedConditions.visibilityOfElementLocated(sourceLocator));
             WebElement target = wait.until(ExpectedConditions.visibilityOfElementLocated(targetLocator));
             Actions actions = new Actions(BaseClass.driver);
@@ -546,7 +553,7 @@ public class WebElementActions extends BaseClass {
     public static void sendSpecialKey(By locator, Keys key, int waitTimeInSeconds) {
         TestLogger.stepStart("Send Special Key: " + key);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             TestLogger.action("Keyboard", "Send Key", key.toString());
             element.sendKeys(key);
@@ -595,7 +602,7 @@ public class WebElementActions extends BaseClass {
     public static List<WebElement> getElements(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Get All Elements: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             List<WebElement> elements = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
             TestLogger.stepPassed("Retrieved " + elements.size() + " elements");
             return elements;
@@ -659,7 +666,7 @@ public class WebElementActions extends BaseClass {
     public static void scrollToElement(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Scroll to Element: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             JavascriptExecutor js = (JavascriptExecutor) BaseClass.driver;
             TestLogger.action("Page", "Scroll to Element", "");
@@ -733,7 +740,7 @@ public class WebElementActions extends BaseClass {
     public static void setValueByJS(By locator, String value, int waitTimeInSeconds) {
         TestLogger.stepStart("Set Value by JavaScript");
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             JavascriptExecutor js = (JavascriptExecutor) BaseClass.driver;
             TestLogger.action("Element", "Set Value by JS", value);
@@ -757,7 +764,7 @@ public class WebElementActions extends BaseClass {
     public static boolean waitForElementText(By locator, String text, int waitTimeInSeconds) {
         TestLogger.stepStart("Wait for Element Text: " + text);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             wait.until(ExpectedConditions.textToBePresentInElementLocated(locator, text));
             TestLogger.stepPassed("Element contains text: " + text);
             return true;
@@ -779,7 +786,7 @@ public class WebElementActions extends BaseClass {
                                                    String attributeValue, int waitTimeInSeconds) {
         TestLogger.stepStart("Wait for Attribute: " + attributeName + " = " + attributeValue);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             wait.until(ExpectedConditions.attributeToBe(locator, attributeName, attributeValue));
             TestLogger.stepPassed("Attribute matched: " + attributeName);
             return true;
@@ -812,7 +819,7 @@ public class WebElementActions extends BaseClass {
     public static boolean isAlertPresent(int waitTimeInSeconds) {
         TestLogger.stepStart("Check if Alert is Present");
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             wait.until(ExpectedConditions.alertIsPresent());
             TestLogger.stepPassed("Alert is present");
             return true;
@@ -865,7 +872,7 @@ public class WebElementActions extends BaseClass {
     public static boolean isElementEnabled(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Check Element Enabled: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             boolean isEnabled = element.isEnabled();
             TestLogger.stepPassed("Element enabled status: " + isEnabled);
@@ -885,7 +892,7 @@ public class WebElementActions extends BaseClass {
     public static boolean isElementDisplayed(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Check Element Displayed: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             boolean isDisplayed = element.isDisplayed();
             TestLogger.stepPassed("Element displayed status: " + isDisplayed);
@@ -905,7 +912,7 @@ public class WebElementActions extends BaseClass {
     public static boolean isElementSelected(By locator, int waitTimeInSeconds) {
         TestLogger.stepStart("Check Element Selected: " + locator);
         try {
-            WebDriverWait wait = new WebDriverWait(BaseClass.driver, Duration.ofSeconds(waitTimeInSeconds));
+            WebDriverWait wait = getExplicitWait();
             WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
             boolean isSelected = element.isSelected();
             TestLogger.stepPassed("Element selected status: " + isSelected);

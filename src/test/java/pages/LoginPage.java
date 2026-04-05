@@ -66,12 +66,6 @@ public class LoginPage extends BaseClass {
             enterPassword(password);
             clickLoginButton();
             
-            // Check for potential alert after login (e.g., successful login notification)
-            if (WebElementActions.isAlertPresent(5)) {
-                WebElementActions.acceptAlert();
-                TestLogger.info("Alert accepted successfully after login");
-            }
-            
             TestLogger.stepPassed("Logged in successfully");
         } catch (Exception e) {
             TestLogger.stepFailed("Login failed", e);

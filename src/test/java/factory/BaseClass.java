@@ -76,7 +76,7 @@ public class BaseClass {
         if (browser.equalsIgnoreCase("chrome")) {
 
             ChromeOptions options = new ChromeOptions();
-           // options.addArguments("--incognito"); // no cookies or cache
+            options.addArguments("--incognito"); // no cookies or cache
             options.addArguments("--disable-cache");
 
             HashMap<String, Object> prefs = new HashMap<>();

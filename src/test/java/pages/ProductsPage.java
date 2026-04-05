@@ -23,7 +23,7 @@ public class ProductsPage extends BaseClass {
     private final By cartBadge = By.className("shopping_cart_badge");
     private final By cartButton = By.className("shopping_cart_link");
 
-    private String addToCartButtonXPath = "//div[text()='%s']/ancestor::div[@class='inventory_item_description']//button";
+    private String addToCartButtonXPath = "//div[contains(@class, 'inventory_item_name') and text()='%s']/ancestor::div[contains(@class, 'inventory_item')]//button";
 
     // ==================== CONSTRUCTOR ====================
     public ProductsPage() {

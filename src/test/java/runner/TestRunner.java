@@ -14,8 +14,9 @@ import org.junit.runner.RunWith;
         "json:target/cucumber-reports/cucumber.json",
         "junit:target/cucumber-reports/cucumber.xml",
         "listeners.ExtentReportListener"
-    },
-    tags = "@Smoke"
+    }
+
+    // Tags (@Login, @ShoppingCart, @Checkout, @Inventory,
 )
 public class TestRunner {
 

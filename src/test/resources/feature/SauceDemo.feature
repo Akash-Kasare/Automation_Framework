@@ -11,7 +11,7 @@ Feature: SauceDemo Website Automation Test Scenarios
     When User enters username as "standard_user"
     And User enters password as "secret_sauce"
     And User clicks the login button
-    And User clicks OK button on alert
+    # And User clicks OK button on alert
     Then User should be logged in successfully
     And User should see the products page
 

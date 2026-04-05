@@ -62,11 +62,6 @@ public class SauceDemoSteps {
     @And("User clicks the login button")
     public void userClicksTheLoginButton() {
         loginPage.clickLoginButton();
-        // Handle optional alert after login
-        if (WebElementActions.isAlertPresent(5)) {
-            WebElementActions.acceptAlert();
-            TestLogger.info("Alert accepted successfully after login click");
-        }
     }
 
     @And("User clicks OK button on alert")
@@ -126,7 +121,11 @@ public class SauceDemoSteps {
     @And("User clicks {string} button for {string}")
     public void userClicksButtonFor(String buttonName, String productName) {
         if (buttonName.equalsIgnoreCase("Add to Cart")) {
-            productsPage.addProductToCart(productName);
+            if (factory.BaseClass.getDriver().getCurrentUrl().contains("inventory-item.html")) {
+                productDetailsPage.clickAddToCart();
+            } else {
+                productsPage.addProductToCart(productName);
+            }
         }
     }
 
