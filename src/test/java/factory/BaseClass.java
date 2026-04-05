@@ -32,7 +32,7 @@ public class BaseClass {
             String os = prop.getProperty("os").toLowerCase();
 
             if (executionEnv.equalsIgnoreCase("local")) {
-                driver = initializeLocalDriver(browser, os);
+                driver = initializeLocalDriver(browser, os);c
             } else if (executionEnv.equalsIgnoreCase("remote")) {
                 driver = initializeRemoteDriver(browser, os);
             } else {
@@ -98,6 +98,16 @@ public class BaseClass {
         }
 
         return new RemoteWebDriver(url, capabilities);
+    }
+
+    /**
+     * Get the WebDriver instance, initialize if necessary
+     */
+    public static WebDriver getDriver() {
+        if (driver == null) {
+            initializeDriver();
+        }
+        return driver;
     }
 
     /**

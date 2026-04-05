@@ -7,13 +7,15 @@ target/
 .idea/
 .mvn/
 .log/**test-*.log
-.target/
+
 *md
 logs/
 QUICK_START_CARD.txt
 upload-to-github.ps1
 logs/
 *.log
+src/test/resources/screenshots/*
+*.md
 
 
 

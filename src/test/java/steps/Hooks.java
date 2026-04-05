@@ -22,6 +22,7 @@ public class Hooks extends BaseClass {
      */
     @Before
     public void beforeScenario(Scenario scenario) {
+        BaseClass.getDriver(); // Initialize driver
         scenarioStartTime = System.currentTimeMillis();
         TestLogger.scenarioStart(scenario.getName());
         TestLogger.info("Scenario Tags: " + scenario.getSourceTagNames());
