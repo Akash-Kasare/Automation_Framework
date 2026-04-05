@@ -50,6 +50,7 @@ public class SauceDemoSteps {
 
     @When("User enters username as {string}")
     public void userEntersUsernameAs(String username) {
+        context.setTestData("Username", username);
         loginPage.enterUsername(username);
     }
 
@@ -108,6 +109,7 @@ public class SauceDemoSteps {
 
     @When("User logs in with username {string} and password {string}")
     public void userLogsInWithUsernameAndPassword(String username, String password) {
+        context.setTestData("Username", username);
         loginPage.login(username, password);
     }
 

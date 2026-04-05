@@ -16,6 +16,11 @@ import java.util.Date;
 public class Hooks extends BaseClass {
 
     private long scenarioStartTime;
+    private static ThreadLocal<factory.TestContext> testContext = new ThreadLocal<>();
+
+    public static factory.TestContext getTestContext() {
+        return testContext.get();
+    }
 
     /**
      * Hook to execute before each scenario
@@ -23,6 +28,7 @@ public class Hooks extends BaseClass {
     @Before
     public void beforeScenario(Scenario scenario) {
         BaseClass.getDriver(); // Initialize driver
+        testContext.set(new factory.TestContext());
         scenarioStartTime = System.currentTimeMillis();
         TestLogger.scenarioStart(scenario.getName());
         TestLogger.info("Scenario Tags: " + scenario.getSourceTagNames());
@@ -51,6 +57,8 @@ public class Hooks extends BaseClass {
             TestLogger.info("WebDriver closed successfully");
         } catch (Exception e) {
             TestLogger.error("Error closing driver: " + e.getMessage());
+        } finally {
+            testContext.remove();
         }
     }
 

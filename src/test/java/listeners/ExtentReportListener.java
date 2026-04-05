@@ -178,13 +178,24 @@ public class ExtentReportListener implements EventListener {
     private void onTestCaseFinished(TestCaseFinished event) {
         Result result = event.getResult();
         String testName = event.getTestCase().getName();
+        long duration = result.getDuration().toMillis();
+        String status = result.getStatus().name();
+        
+        // Retrieve test data from Hooks context
+        java.util.Map<String, String> dataUsed = null;
+        if (steps.Hooks.getTestContext() != null) {
+            dataUsed = steps.Hooks.getTestContext().getAllTestData();
+        }
+
+        // Write to Excel Execution Report
+        utils.ExcelUtils.writeExecutionReport(testName, dataUsed, status, duration);
 
         switch (result.getStatus()) {
             case PASSED:
                 TestLogger.info("========== Test Case PASSED: " + testName + " ==========");
                 if (extentTest != null) {
                     extentTest.log(Status.PASS, "Test Case Passed: " + testName);
-                    extentTest.log(Status.INFO, "Execution Time: " + result.getDuration().toMillis() + " ms");
+                    extentTest.log(Status.INFO, "Execution Time: " + duration + " ms");
                 }
                 break;
             case FAILED:
@@ -195,7 +206,7 @@ public class ExtentReportListener implements EventListener {
                         extentTest.log(Status.FAIL, "Exception: " + result.getError().getMessage());
                         extentTest.log(Status.FAIL, "Stack Trace:\n" + getStackTrace(result.getError()));
                     }
-                    extentTest.log(Status.INFO, "Execution Time: " + result.getDuration().toMillis() + " ms");
+                    extentTest.log(Status.INFO, "Execution Time: " + duration + " ms");
                 }
                 break;
             case SKIPPED:

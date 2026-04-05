@@ -348,7 +348,7 @@ public class ExcelUtils {
     private static CellStyle createStatusStyle(Workbook workbook, String status) {
         CellStyle style = workbook.createCellStyle();
 
-        if ("PASS".equalsIgnoreCase(status)) {
+        if (status != null && (status.equalsIgnoreCase("PASS") || status.equalsIgnoreCase("PASSED"))) {
             // Green background
             style.setFillForegroundColor(new XSSFColor(new byte[]{(byte) 146, (byte) 208, (byte) 80}));
             style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
@@ -358,14 +358,14 @@ public class ExcelUtils {
             font.setBold(true);
             font.setColor(IndexedColors.DARK_GREEN.getIndex());
             style.setFont(font);
-        } else if ("FAIL".equalsIgnoreCase(status)) {
+        } else if (status != null && (status.equalsIgnoreCase("FAIL") || status.equalsIgnoreCase("FAILED"))) {
             // Red background
             style.setFillForegroundColor(new XSSFColor(new byte[]{(byte) 255, (byte) 0, (byte) 0}));
             style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-            // White font
+            // Black font
             Font font = workbook.createFont();
-            font.setColor(IndexedColors.WHITE.getIndex());
+            font.setColor(IndexedColors.BLACK.getIndex());
             font.setBold(true);
             style.setFont(font);
         }
@@ -416,6 +416,102 @@ public class ExcelUtils {
         if (file.exists()) {
             file.delete();
             TestLogger.info("Results file cleared");
+        }
+    }
+
+    /**
+     * Write comprehensive execution report to Excel
+     * 
+     * @param testcaseName Name of the test case
+     * @param dataUsed Map of test data used
+     * @param status PASS or FAIL
+     * @param executionTime Execution time in ms
+     */
+    public static synchronized void writeExecutionReport(String testcaseName, Map<String, String> dataUsed, String status, long executionTime) {
+        String reportFile = "src/test/resources/testdata/Execution_Report.xlsx";
+        File file = new File(reportFile);
+        File parentDir = file.getParentFile();
+        if (!parentDir.exists()) {
+            parentDir.mkdirs();
+        }
+
+        Workbook workbook = null;
+        try {
+            if (file.exists()) {
+                try (FileInputStream fis = new FileInputStream(file)) {
+                    workbook = new XSSFWorkbook(fis);
+                }
+            } else {
+                workbook = new XSSFWorkbook();
+            }
+
+            Sheet sheet = workbook.getSheet("ExecutionReport");
+            if (sheet == null) {
+                sheet = workbook.createSheet("ExecutionReport");
+                // Create Header
+                Row header = sheet.createRow(0);
+                String[] columns = {"TestCase Name", "Test Data", "Status", "Execution Time (ms)", "Timestamp"};
+                CellStyle headerStyle = createHeaderStyle(workbook);
+                for (int i = 0; i < columns.length; i++) {
+                    Cell cell = header.createCell(i);
+                    cell.setCellValue(columns[i]);
+                    cell.setCellStyle(headerStyle);
+                }
+            }
+
+            // Prepare Data Used string (exclude sensitive info like password)
+            StringBuilder dataStr = new StringBuilder();
+            if (dataUsed != null) {
+                for (Map.Entry<String, String> entry : dataUsed.entrySet()) {
+                    if (!entry.getKey().toLowerCase().contains("password")) {
+                        if (dataStr.length() > 0) dataStr.append(", ");
+                        dataStr.append(entry.getKey()).append(": ").append(entry.getValue());
+                    }
+                }
+            }
+
+            // Create new row at the end
+            int lastRow = sheet.getLastRowNum();
+            Row row = sheet.createRow(lastRow + 1);
+
+            row.createCell(0).setCellValue(testcaseName);
+            row.createCell(1).setCellValue(dataStr.toString());
+            
+            Cell statusCell = row.createCell(2);
+            statusCell.setCellValue(status.toUpperCase());
+            statusCell.setCellStyle(createStatusStyle(workbook, status));
+
+            // Format execution time to HH:mm:ss
+            long seconds = (executionTime / 1000) % 60;
+            long minutes = (executionTime / (1000 * 60)) % 60;
+            long hours = (executionTime / (1000 * 60 * 60));
+            String timeString = String.format("%02d:%02d:%02d", hours, minutes, seconds);
+            
+            row.createCell(3).setCellValue(timeString);
+            row.createCell(4).setCellValue(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date()));
+
+            // Auto size columns
+            for (int i = 0; i < 5; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            // Save file
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                workbook.write(fos);
+            }
+            
+            TestLogger.info("Execution report updated in Excel for: " + testcaseName);
+
+        } catch (IOException e) {
+            TestLogger.error("Failed to write execution report to Excel: " + e.getMessage());
+        } finally {
+            if (workbook != null) {
+                try {
+                    workbook.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
         }
     }
 
