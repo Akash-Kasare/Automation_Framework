@@ -21,7 +21,7 @@ Feature: SauceDemo Website Automation Test Scenarios
     And User enters password as "secret_sauce"
     And User clicks the login button
     Then User should see an error message
-    And Error message should display "Epic sadface: User does not exist!"
+    And Error message should display "Epic sadface: Username and password do not match any user in this service"
 
   @Login @Negative
   Scenario: User fails to login with invalid password

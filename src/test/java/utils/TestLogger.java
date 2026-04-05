@@ -47,6 +47,11 @@ public class TestLogger {
                     flush(); // Ensure log is printed immediately
                 }
             };
+            try {
+                stdoutHandler.setEncoding("UTF-8");
+            } catch (Exception e) {
+                System.err.println("Could not set UTF-8 encoding for logger: " + e.getMessage());
+            }
             stdoutHandler.setLevel(Level.ALL);
             logger.addHandler(stdoutHandler);
 
@@ -76,7 +81,10 @@ public class TestLogger {
                     // Check if it's a known status
                     if (isKnownStatus(possibleStatus)) {
                         status = possibleStatus;
-                        message = message.substring(endIdx + 1).trim();
+                        message = message.substring(endIdx + 1);
+                        if (message.startsWith(" ")) {
+                            message = message.substring(1);
+                        }
                     }
                 }
             }
@@ -147,15 +155,40 @@ public class TestLogger {
      * Log scenario start
      */
     public static void scenarioStart(String scenarioName) {
-        info("[STARTED] SCENARIO: " + scenarioName);
+        String paddedScenario = padRight("SCENARIO STARTED: " + scenarioName, 65);
+        String paddedTime = padRight("Start Time: " + LocalDateTime.now().format(dateTimeFormatter), 65);
+        String message = String.format(
+            "\n"+
+            "+-------------------------------------------------------------------+\n" +
+            "| %s |\n" +
+            "| %s |\n" +
+            "+-------------------------------------------------------------------+",
+            paddedScenario,
+            paddedTime
+        );
+        info(message);
     }
 
     /**
      * Log scenario completed with status
      */
     public static void scenarioCompleted(String scenarioName, String status, long duration) {
-        String message = String.format("[%s] SCENARIO: %s | Time: %d ms", 
-            status.toUpperCase(), scenarioName, duration);
+        String statusText = status.toUpperCase();
+        String paddedScenario = padRight(String.format("[%s] SCENARIO COMPLETED: %s", statusText, scenarioName), 65);
+        String paddedDuration = padRight(String.format("Total Duration: %d ms", duration), 65);
+        String paddedTime = padRight("End Time: " + LocalDateTime.now().format(dateTimeFormatter), 65);
+        
+        String message = String.format(
+            "\n" +
+            "+-------------------------------------------------------------------+\n" +
+            "| %s |\n" +
+            "| %s |\n" +
+            "| %s |\n" +
+            "+-------------------------------------------------------------------+",
+            paddedScenario,
+            paddedDuration,
+            paddedTime
+        );
 
         if (status.equalsIgnoreCase("PASSED")) {
             info(message);
