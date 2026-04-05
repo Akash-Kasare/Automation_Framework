@@ -2,12 +2,14 @@ package factory;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Properties;
 import java.time.Duration;
 
@@ -32,7 +34,7 @@ public class BaseClass {
             String os = prop.getProperty("os").toLowerCase();
 
             if (executionEnv.equalsIgnoreCase("local")) {
-                driver = initializeLocalDriver(browser, os);c
+                driver = initializeLocalDriver(browser, os);
             } else if (executionEnv.equalsIgnoreCase("remote")) {
                 driver = initializeRemoteDriver(browser, os);
             } else {
@@ -72,7 +74,17 @@ public class BaseClass {
      */
     private static WebDriver initializeLocalDriver(String browser, String os) {
         if (browser.equalsIgnoreCase("chrome")) {
-            return new ChromeDriver();
+
+            ChromeOptions options = new ChromeOptions();
+           // options.addArguments("--incognito"); // no cookies or cache
+            options.addArguments("--disable-cache");
+
+            HashMap<String, Object> prefs = new HashMap<>();
+            prefs.put("credentials_enable_service", false);
+            prefs.put("profile.password_manager_enabled", false);
+            options.setExperimentalOption("prefs", prefs);
+
+            return new ChromeDriver(options);
         } else if (browser.equalsIgnoreCase("edge")) {
             return new EdgeDriver();
         } else {

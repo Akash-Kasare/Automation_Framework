@@ -38,10 +38,11 @@ public class Hooks extends BaseClass {
 
         TestLogger.scenarioCompleted(scenario.getName(), status, scenarioDuration);
 
-        // Take screenshot if scenario failed
+        // Take screenshot if scenario failed (for local storage/history)
+        // Note: ExtentReportListener also handles screenshot for the report
         if (scenario.isFailed()) {
-            TestLogger.error("Scenario failed. Taking screenshot...");
-            takeScreenshot(scenario.getName());
+            TestLogger.error("Scenario failed. Saving screenshot for local logs...");
+            utils.ExtentReportUtils.captureScreenshot(BaseClass.getDriver(), scenario.getName().replaceAll(" ", "_"));
         }
 
         // Close the driver
@@ -54,34 +55,11 @@ public class Hooks extends BaseClass {
     }
 
     /**
-     * Method to take screenshot on failure
+     * Method to take screenshot on failure (Deprecated: use ExtentReportUtils instead)
      */
     private void takeScreenshot(String scenarioName) {
-        try {
-            // Create screenshots folder if it doesn't exist
-            File screenshotsDir = new File("src/test/resources/screenshots");
-            if (!screenshotsDir.exists()) {
-                boolean created = screenshotsDir.mkdirs();
-                if (!created) {
-                    TestLogger.warning("Failed to create screenshots directory");
-                }
-            }
-
-            // Generate timestamp for unique filename
-            String timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-            String fileName = scenarioName.replaceAll(" ", "_") + "_" + timestamp + ".png";
-            String filePath = "src/test/resources/screenshots/" + fileName;
-
-            // Take screenshot
-            TakesScreenshot screenshot = (TakesScreenshot) BaseClass.driver;
-            File source = screenshot.getScreenshotAs(OutputType.FILE);
-            File destination = new File(filePath);
-            FileUtils.copyFile(source, destination);
-
-            TestLogger.info("Screenshot saved: " + filePath);
-        } catch (IOException e) {
-            TestLogger.error("Failed to take screenshot: " + e.getMessage());
-        }
+        // Method kept for internal consistency but logic moved to ExtentReportUtils
+        utils.ExtentReportUtils.captureScreenshot(BaseClass.getDriver(), scenarioName.replaceAll(" ", "_"));
     }
 }
 

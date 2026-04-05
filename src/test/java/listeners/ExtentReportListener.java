@@ -25,8 +25,13 @@ public class ExtentReportListener implements EventListener {
     public static ExtentReports extentReports;
     public static ExtentTest extentTest;
     private static final String REPORT_PATH = "target/extent-reports";
-    private static final String REPORT_FILE = REPORT_PATH + "/extent-report.html";
+    private static String REPORT_FILE;
 
+    static {
+        // Initialize report file name with timestamp
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        REPORT_FILE = REPORT_PATH + "/SauceDemo_Report_" + timestamp + ".html";
+    }
 
     /**
      * Initialize Extent Report when test run starts
@@ -45,6 +50,10 @@ public class ExtentReportListener implements EventListener {
      * Called when test run starts
      */
     private void onTestRunStarted() {
+        // Refresh the timestamp and file name at the start of the run
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        REPORT_FILE = REPORT_PATH + "/SauceDemo_Report_" + timestamp + ".html";
+
         TestLogger.info("========== Extent Report Initialization Started ==========");
 
         // Create report directory
@@ -55,7 +64,7 @@ public class ExtentReportListener implements EventListener {
             }
         }
 
-        // Initialize Extent Reports
+        // Initialize Extent Reports with the timestamped file
         ExtentSparkReporter sparkReporter = new ExtentSparkReporter(REPORT_FILE);
 
         // Configure reporter
@@ -130,6 +139,9 @@ public class ExtentReportListener implements EventListener {
                         if (result.getError() != null) {
                             extentTest.log(Status.FAIL, "Error: " + result.getError().getMessage());
                         }
+                        
+                        // Use ExtentReportUtils.onStepFailure to capture and attach screenshot
+                        utils.ExtentReportUtils.onStepFailure(factory.BaseClass.getDriver(), stepText, extentTest);
                     }
                     break;
                 case SKIPPED:
@@ -171,12 +183,14 @@ public class ExtentReportListener implements EventListener {
             case PASSED:
                 TestLogger.info("========== Test Case PASSED: " + testName + " ==========");
                 if (extentTest != null) {
+                    extentTest.log(Status.PASS, "Test Case Passed: " + testName);
                     extentTest.log(Status.INFO, "Execution Time: " + result.getDuration().toMillis() + " ms");
                 }
                 break;
             case FAILED:
                 TestLogger.error("========== Test Case FAILED: " + testName + " ==========");
                 if (extentTest != null) {
+                    extentTest.log(Status.FAIL, "Test Case Failed: " + testName);
                     if (result.getError() != null) {
                         extentTest.log(Status.FAIL, "Exception: " + result.getError().getMessage());
                         extentTest.log(Status.FAIL, "Stack Trace:\n" + getStackTrace(result.getError()));
@@ -186,6 +200,9 @@ public class ExtentReportListener implements EventListener {
                 break;
             case SKIPPED:
                 TestLogger.warning("========== Test Case SKIPPED: " + testName + " ==========");
+                if (extentTest != null) {
+                    extentTest.log(Status.SKIP, "Test Case Skipped: " + testName);
+                }
                 break;
         }
     }

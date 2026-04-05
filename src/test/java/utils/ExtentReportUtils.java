@@ -86,6 +86,32 @@ public class ExtentReportUtils {
     }
 
     /**
+     * Handle step failure by capturing and attaching screenshot
+     * @param driver - WebDriver instance
+     * @param stepName - Name of the failed step
+     * @param extentTest - ExtentTest object for the current scenario
+     */
+    public static void onStepFailure(WebDriver driver, String stepName, com.aventstack.extentreports.ExtentTest extentTest) {
+        try {
+            TestLogger.error("[FAILED] Step: " + stepName);
+            
+            // Capture screenshot as Base64
+            String base64Screenshot = captureScreenshotAsBase64(driver);
+            
+            if (base64Screenshot != null && extentTest != null) {
+                // Attach to extent report (raw base64 string, prefix is added by library)
+                extentTest.addScreenCaptureFromBase64String(base64Screenshot, "Failure Screenshot: " + stepName);
+                TestLogger.info("Screenshot attached to report for failed step: " + stepName);
+                
+                // Also save a physical file for local logs
+                captureScreenshot(driver, stepName.replaceAll(" ", "_"));
+            }
+        } catch (Exception e) {
+            TestLogger.error("Error during onStepFailure: " + e.getMessage());
+        }
+    }
+
+    /**
      * Log test execution details to Extent Report
      */
     public static void logTestDetails(String category, String details) {

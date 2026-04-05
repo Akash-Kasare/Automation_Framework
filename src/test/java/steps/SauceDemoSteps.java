@@ -61,18 +61,21 @@ public class SauceDemoSteps {
     @And("User clicks the login button")
     public void userClicksTheLoginButton() {
         loginPage.clickLoginButton();
+        // Handle optional alert after login
+        if (WebElementActions.isAlertPresent(5)) {
+            WebElementActions.acceptAlert();
+            TestLogger.info("Alert accepted successfully after login click");
+        }
     }
 
     @And("User clicks OK button on alert")
     public void userClicksOKButtonOnAlert() {
-        TestLogger.info("Waiting for any alert to appear...");
-        WebElementActions.waitFor(5000); // Wait for sometimes as requested
-        if (WebElementActions.isAlertPresent(5)) {
+        // This step is now partially redundant but kept for feature file compatibility
+        if (WebElementActions.isAlertPresent(2)) {
             WebElementActions.acceptAlert();
-            WebElementActions.
             TestLogger.info("Alert accepted successfully");
         } else {
-            TestLogger.info("No alert appeared after login");
+            TestLogger.info("Alert already handled or not present");
         }
     }
 

@@ -39,11 +39,19 @@ public class TestLogger {
             fileHandler.setLevel(Level.ALL);
             logger.addHandler(fileHandler);
 
-            // Console handler for console output
-            java.util.logging.ConsoleHandler consoleHandler = new java.util.logging.ConsoleHandler();
-            consoleHandler.setFormatter(new CustomFormatter());
-            consoleHandler.setLevel(Level.ALL);
-            logger.addHandler(consoleHandler);
+            // Custom handler to redirect logs to System.out instead of System.err
+            java.util.logging.StreamHandler stdoutHandler = new java.util.logging.StreamHandler(System.out, new CustomFormatter()) {
+                @Override
+                public synchronized void publish(LogRecord record) {
+                    super.publish(record);
+                    flush(); // Ensure log is printed immediately
+                }
+            };
+            stdoutHandler.setLevel(Level.ALL);
+            logger.addHandler(stdoutHandler);
+
+            // Disable parent handlers to prevent duplicate logging
+            logger.setUseParentHandlers(false);
 
             logger.setLevel(Level.ALL);
         } catch (IOException e) {
@@ -57,12 +65,38 @@ public class TestLogger {
     private static class CustomFormatter extends Formatter {
         @Override
         public String format(LogRecord record) {
+            String message = record.getMessage();
+            String status = "EXEC"; // Default status
+
+            // Extract status if message starts with [STATUS]
+            if (message.startsWith("[")) {
+                int endIdx = message.indexOf("]");
+                if (endIdx > 0) {
+                    String possibleStatus = message.substring(1, endIdx);
+                    // Check if it's a known status
+                    if (isKnownStatus(possibleStatus)) {
+                        status = possibleStatus;
+                        message = message.substring(endIdx + 1).trim();
+                    }
+                }
+            }
+
             return String.format(
-                "[%s] [%s] %s%n",
+                "[%-5s] [%-7s] [%s] %s%n",
                 record.getLevel(),
+                status,
                 LocalDateTime.now().format(timeFormatter),
-                record.getMessage()
+                message
             );
+        }
+
+        private boolean isKnownStatus(String status) {
+            return status.equals("PASSED") || status.equals("FAILED") || 
+                   status.equals("SKIPPED") || status.equals("PENDING") || 
+                   status.equals("AMBIGUOUS") || status.equals("UNDEFINED") ||
+                   status.equals("STARTED") || status.equals("COMPLETED") ||
+                   status.equals("INFO") || status.equals("WARNING") ||
+                   status.equals("ERROR");
         }
     }
 
@@ -72,15 +106,8 @@ public class TestLogger {
     public static void stepStart(String stepDescription) {
         stepStartTime = System.currentTimeMillis();
         currentStep = stepDescription;
-        String message = String.format(
-            "\n╔════════════════════════════════════════════════════════════╗\n" +
-            "║ STEP STARTED: %s\n" +
-            "║ Timestamp: %s\n" +
-            "╚════════════════════════════════════════════════════════════╝",
-            padRight(stepDescription, 57),
-            LocalDateTime.now().format(dateTimeFormatter)
-        );
-        logger.info(message);
+        String message = String.format("[STARTED] Step: %s", stepDescription);
+        info(message);
     }
 
     /**
@@ -88,20 +115,9 @@ public class TestLogger {
      */
     public static void stepPassed(String message) {
         long duration = System.currentTimeMillis() - stepStartTime;
-        String logMessage = String.format(
-            "╔════════════════════════════════════════════════════════════╗\n" +
-            "║ ✅ STEP PASSED\n" +
-            "║ Step: %s\n" +
-            "║ Message: %s\n" +
-            "║ Execution Time: %s ms\n" +
-            "║ Timestamp: %s\n" +
-            "╚════════════════════════════════════════════════════════════╝",
-            padRight(currentStep, 57),
-            padRight(message, 57),
-            duration,
-            LocalDateTime.now().format(dateTimeFormatter)
-        );
-        logger.info(logMessage);
+        String logMessage = String.format("[PASSED] Step: %s | Message: %s | Time: %d ms", 
+            currentStep, message, duration);
+        info(logMessage);
     }
 
     /**
@@ -109,28 +125,12 @@ public class TestLogger {
      */
     public static void stepFailed(String errorMessage, Throwable e) {
         long duration = System.currentTimeMillis() - stepStartTime;
-        String logMessage = String.format(
-            "╔════════════════════════════════════════════════════════════╗\n" +
-            "║ ❌ STEP FAILED\n" +
-            "║ Step: %s\n" +
-            "║ Error: %s\n" +
-            "║ Exception: %s\n" +
-            "║ Execution Time: %s ms\n" +
-            "║ Timestamp: %s\n" +
-            "╚════════════════════════════════════════════════════════════╝",
-            padRight(currentStep, 57),
-            padRight(errorMessage, 57),
-            e != null ? padRight(e.getClass().getSimpleName() + ": " + e.getMessage(), 57) : "N/A",
-            duration,
-            LocalDateTime.now().format(dateTimeFormatter)
-        );
-        logger.severe(logMessage);
+        String logMessage = String.format("[FAILED] Step: %s | Error: %s | Time: %d ms", 
+            currentStep, errorMessage, duration);
+        error(logMessage);
 
         if (e != null) {
-            logger.severe("Stack Trace:");
-            for (StackTraceElement element : e.getStackTrace()) {
-                logger.severe("\t" + element.toString());
-            }
+            error("[ERROR] Exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -138,59 +138,29 @@ public class TestLogger {
      * Log step skipped
      */
     public static void stepSkipped(String reason) {
-        String message = String.format(
-            "╔════════════════════════════════════════════════════════════╗\n" +
-            "║ ⏭️  STEP SKIPPED\n" +
-            "║ Step: %s\n" +
-            "║ Reason: %s\n" +
-            "║ Timestamp: %s\n" +
-            "╚════════════════════════════════════════════════════════════╝",
-            padRight(currentStep, 57),
-            padRight(reason, 57),
-            LocalDateTime.now().format(dateTimeFormatter)
-        );
-        logger.warning(message);
+        String message = String.format("[SKIPPED] Step: %s | Reason: %s", 
+            currentStep, reason);
+        warning(message);
     }
 
     /**
      * Log scenario start
      */
     public static void scenarioStart(String scenarioName) {
-        String message = String.format(
-            "\n" +
-            "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n" +
-            "┃ SCENARIO STARTED: %s\n" +
-            "┃ Start Time: %s\n" +
-            "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛",
-            padRight(scenarioName, 57),
-            LocalDateTime.now().format(dateTimeFormatter)
-        );
-        logger.info(message);
+        info("[STARTED] SCENARIO: " + scenarioName);
     }
 
     /**
      * Log scenario completed with status
      */
     public static void scenarioCompleted(String scenarioName, String status, long duration) {
-        String statusSymbol = status.equalsIgnoreCase("PASSED") ? "✅" : "❌";
-        String message = String.format(
-            "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n" +
-            "┃ %s SCENARIO COMPLETED: %s\n" +
-            "┃ Status: %s\n" +
-            "┃ Total Duration: %s ms\n" +
-            "┃ End Time: %s\n" +
-            "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛",
-            statusSymbol,
-            padRight(scenarioName, 57),
-            status,
-            duration,
-            LocalDateTime.now().format(dateTimeFormatter)
-        );
+        String message = String.format("[%s] SCENARIO: %s | Time: %d ms", 
+            status.toUpperCase(), scenarioName, duration);
 
         if (status.equalsIgnoreCase("PASSED")) {
-            logger.info(message);
+            info(message);
         } else {
-            logger.severe(message);
+            error(message);
         }
     }
 
@@ -198,17 +168,7 @@ public class TestLogger {
      * Log test suite start
      */
     public static void testSuiteStart(String suiteName) {
-        String message = String.format(
-            "\n\n" +
-            "╔════════════════════════════════════════════════════════════╗\n" +
-            "║        TEST SUITE STARTED\n" +
-            "║        Suite: %s\n" +
-            "║        Start Time: %s\n" +
-            "╚════════════════════════════════════════════════════════════╝",
-            padRight(suiteName, 57),
-            LocalDateTime.now().format(dateTimeFormatter)
-        );
-        logger.info(message);
+        info("[STARTED] SUITE: " + suiteName);
     }
 
     /**
@@ -216,32 +176,14 @@ public class TestLogger {
      */
     public static void testSuiteCompleted(String suiteName, int totalTests, int passed,
                                          int failed, int skipped, long duration) {
-        double passPercentage = totalTests > 0 ? (passed * 100.0) / totalTests : 0;
-        String message = String.format(
-            "╔════════════════════════════════════════════════════════════╗\n" +
-            "║        TEST SUITE COMPLETED\n" +
-            "║        Suite: %s\n" +
-            "║        Total Tests: %d\n" +
-            "║        ✅ Passed: %d (%.2f%%)\n" +
-            "║        ❌ Failed: %d\n" +
-            "║        ⏭️  Skipped: %d\n" +
-            "║        ⏱️  Total Duration: %s ms\n" +
-            "║        End Time: %s\n" +
-            "╚════════════════════════════════════════════════════════════╝\n",
-            padRight(suiteName, 57),
-            totalTests,
-            passed,
-            passPercentage,
-            failed,
-            skipped,
-            duration,
-            LocalDateTime.now().format(dateTimeFormatter)
-        );
+        String status = failed == 0 ? "PASSED" : "FAILED";
+        String message = String.format("[%s] SUITE: %s | Total: %d | P: %d | F: %d | S: %d | Time: %d ms",
+            status, suiteName, totalTests, passed, failed, skipped, duration);
 
         if (failed == 0) {
-            logger.info(message);
+            info(message);
         } else {
-            logger.severe(message);
+            error(message);
         }
     }
 
@@ -249,28 +191,40 @@ public class TestLogger {
      * Log info message
      */
     public static void info(String message) {
-        logger.info("[INFO] " + message);
+        if (!message.startsWith("[")) {
+            message = "[INFO] " + message;
+        }
+        logger.info(message);
     }
 
     /**
      * Log warning message
      */
     public static void warning(String message) {
-        logger.warning("[WARNING] " + message);
+        if (!message.startsWith("[")) {
+            message = "[WARNING] " + message;
+        }
+        logger.warning(message);
     }
 
     /**
      * Log error message
      */
     public static void error(String message) {
-        logger.severe("[ERROR] " + message);
+        if (!message.startsWith("[")) {
+            message = "[ERROR] " + message;
+        }
+        logger.severe(message);
     }
 
     /**
      * Log debug message
      */
     public static void debug(String message) {
-        logger.fine("[DEBUG] " + message);
+        if (!message.startsWith("[")) {
+            message = "[DEBUG] " + message;
+        }
+        logger.fine(message);
     }
 
     /**
@@ -278,30 +232,29 @@ public class TestLogger {
      */
     public static void action(String element, String action, String details) {
         String message = String.format(
-            "→ Action: %s | Element: %s | Details: %s",
+            "[ACTION] → %s | Element: %s | Details: %s",
             action,
             element,
             details
         );
-        logger.info(message);
+        info(message);
     }
 
     /**
      * Log assertion
      */
     public static void assertion(String condition, boolean result, String message) {
-        String symbol = result ? "✓" : "✗";
+        String status = result ? "PASSED" : "FAILED";
         String logMessage = String.format(
-            "%s Assertion: %s | Expected: %s | Result: %s",
-            symbol,
+            "[%s] Assertion: %s | Expected: %s",
+            status,
             condition,
-            message,
-            result ? "PASSED" : "FAILED"
+            message
         );
         if (result) {
-            logger.info(logMessage);
+            info(logMessage);
         } else {
-            logger.severe(logMessage);
+            error(logMessage);
         }
     }
 
@@ -309,7 +262,7 @@ public class TestLogger {
      * Log with execution time
      */
     public static void timingLog(String operation, long durationMs) {
-        logger.info(String.format("⏱️  %s completed in %d ms", operation, durationMs));
+        info(String.format("[TIME] %s completed in %d ms", operation, durationMs));
     }
 
     /**

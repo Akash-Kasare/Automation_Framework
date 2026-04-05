@@ -5,7 +5,7 @@ import io.cucumber.junit.CucumberOptions;
 import org.junit.runner.RunWith;
 
 @RunWith(Cucumber.class)
-@CucumberOptions(
+    @CucumberOptions(
     features = "src/test/resources/feature",
     glue = {"steps"},
     plugin = {
@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
         "html:target/cucumber-reports/cucumber.html",
         "json:target/cucumber-reports/cucumber.json",
         "junit:target/cucumber-reports/cucumber.xml",
-        "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:"
+        "listeners.ExtentReportListener"
     },
     tags = "@Smoke"
 )
